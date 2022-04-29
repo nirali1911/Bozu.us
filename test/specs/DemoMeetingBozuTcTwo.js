@@ -8,15 +8,15 @@ describe("interaction with web element", function () {
 
     await browser.url("https://bozu.us");
     await browser.maximizeWindow();
-    //await browser.waitForDisplayed({timeout:5000});
     await browser.pause(5000);
 
     let JoinEvent = await $(
       "//button[@class='btn btn-theme-select mt-2 mb-2']"
     );
-    //await JoinEvent.waitForDisplayed({ timeout: 20000 });
+    await JoinEvent.waitForDisplayed({ timeout: 20000 });
     await JoinEvent.click();
-    // await JoinEvent.waitForDisplayed({timeout:10000});
+    await browser.pause(10000);
+
     console.log(await browser.getUrl());
     if ((await browser.getUrl()) == "https://bozu.us/joinevent") {
       console.log("Successfully redirect on Join Demo Meeting page");
@@ -35,16 +35,13 @@ describe("interaction with web element", function () {
     let Enteryourname = await $("input[placeholder='Enter your name ']");
     await Enteryourname.waitForDisplayed({ timeout: 10000 });
     await Enteryourname.addValue("nirali");
-    await Enteryourname.waitForDisplayed({ timeout: 5000 });
-    //await browser.pause(5000);
+    await browser.pause(5000);
 
     let JoinDemoMeetingNow = await $(
       "div[class='col-lg-12 col-md-12 col-12 text-center mb-4']"
     );
-    await JoinDemoMeetingNow.waitForDisplayed({timeout:5000});
     await JoinDemoMeetingNow.click();
-    // await JoinDemoMeetingNow.waitForDisplayed({timeout:3000});
-    //await browser.pause(3000);
+    await browser.pause(3000);
     if (
       (await $(
         "div[class='col-lg-12 col-md-12 col-12 text-center mt-4 mb-3']"
@@ -62,10 +59,10 @@ describe("interaction with web element", function () {
     let JoinEventNow = await $(
       "//button[@class='btn btn-lg btn-green-select ml-3']"
     );
+    await JoinEventNow.waitForDisplayed({ timeout: 5000 });
     await JoinEventNow.isClickable();
     await JoinEventNow.click();
-    await JoinEventNow.waitForDisplayed({ timeout: 6000 });
-    //await browser.pause(6000);
+    await browser.pause(6000);
     if (
       (await $(
         "(//button[@class='btn btn-theme-select mb-lg-2'])[1]"
@@ -83,8 +80,7 @@ describe("interaction with web element", function () {
 
     let Okay = await $("//button[@class='btn btn-theme-select mb-lg-2']");
     await Okay.click();
-    //await Okay.waitForDisplayed({timeout:5000});
-
+    await browser.pause(5000);
     if (
       (await $(
         "div[class='d-flex title-abs-center align-items-center ng-star-inserted']"
@@ -96,53 +92,100 @@ describe("interaction with web element", function () {
       console.log("Failed to get DemoEvent text");
     }
 
+
+
     let Cancel = await $(
       "//a[@class='text-first ml-auto d-flex align-item-baseline a-no-underline']"
     );
     if (await Cancel.isDisplayed()) {
       await Cancel.click();
-      //await Cancel.waitForDisplayed({timeout:10000});
-      //await browser.pause(150000);
+      await browser.pause(150000);
     }
 
-    for (let i = 1; i <= 20; i++) {
-      let bozuStory = await $(
-        "//div[contains(text(),'BOZU STORY')]//parent::div//div[@class='position-relative dropleft d-flex ng-star-inserted']"
-      );
-      await bozuStory.waitForDisplayed({ timeout: 10000 });
-      await bozuStory.click();
-
-      let joinGroup = await $("//label[@class='ml-2']");
-      //await JoinGroup.waitForDisplayed({ timeout: 10000 });
-      await joinGroup.click();
+    let BozuStory = await $(
+      "//div[contains(text(),'BOZU STORY')]//parent::div//div[@class='position-relative dropleft d-flex ng-star-inserted']"
+    );
+    await BozuStory.waitForDisplayed({ timeout: 10000 });
+    await BozuStory.click();
+    await browser.pause(15000);
+    
+    let JoinGroup = await $("//label[@class='ml-2']");
+    await JoinGroup.waitForDisplayed({ timeout: 10000 });
+    let groupname = $(
+      "div[class='profile-initials-container ng-star-inserted']"
+    ).getText(); //check
+    if (await JoinGroup.isClickable()) {
+      await JoinGroup.click();
       await browser.pause(5000);
-      // let groupname = $(
-      //   "div[class='profile-initials-container ng-star-inserted']"
-      // ).getText(); //check
-      // if (await JoinGroup.isClickable()) {
-      //await JoinGroup.click();
-      //   if ((await groupname) == "nirali") {
-      //     console.log("Successfully entered into BOZU STORY Group");
-      //   } else {
-      //     console.log("Unable to entered into BOZU STORY Group");
-      //   }
-      // } else {
-      //   meetingsuccess = false;
-      // }
+      if ((await groupname) == "nirali") {
+        console.log("Successfully entered into BOZU STORY Group");
+      } else {
+        console.log("Unable to entered into BOZU STORY Group");
+      }
+    } else {
+      meetingsuccess = false;
+    }
+    
+    let audio = await $("#Icon_awesome-microphone-alt-slash");
+    let mute = await $("Icon_awesome-microphone-alt");
+    if (await audio.isEnabled()) {
+      await audio.click();
+      await browser.pause(3000);
+      await mute.isDisplayed();
+      {
+        console.log("Mute Text is displayed");
+      }
+    } else {
+      meetingsuccess = false;
+      console.log("Mute text isn't displayed");
+    }
 
-       let bozuTechTalk = await $$("//*[.=' more_horiz ']");
-       await bozuTechTalk[1].waitForClickable({ timeout: 15000 });
-       await bozuTechTalk[1].click();
+    let video = await $("#Icon_awesome-video-slash");
+    let turnvideooff = await $("#Icon_awesome-video");
+    if (await video.isEnabled()) {
+      await video.click();
+      await browser.pause(3000);
+      await turnvideooff.isDisplayed();
+      {
+        console.log("Turn off video text is displayed");
+      }
+    } else {
+      meetingsuccess = false;
+      console.log("Turn video off text isn't displayed");
+    }
 
-     let joinGroupright = await $$("//label[.='Join Group']");
-     console.log(await joinGroupright.length)
-       //await joinGroupright.isDisplayed();
-      // console.log("%%%%%%%%%%%%%%%%%%");
-       console.log(await joinGroupright[0].isDisplayed());
-       await joinGroupright[0].waitForDisplayed({ timeout: 10000 });
-       await joinGroupright[0].waitForClickable({ timeout: 10000 });
-      await joinGroupright[0].click();
-       await browser.pause(5000);
+    let sharescreen = await $("//li[@class='nav-item d-lg mr-2']");
+    if (await sharescreen.isEnabled()) {
+      await sharescreen.click();
+      await browser.pause(5000);
+
+      if (await $("#share_screen_deselect"));
+      {
+        console.log("Sharescreen got clicked");
+      }
+    } else {
+      meetingsuccess = false;
+      console.log("Sharescreen got unclicked");
+    }
+
+    let Cancelbutton = await $("//a[@class='nav-item nav-link']");
+    if (await Cancelbutton.isClickable()) {
+      await Cancelbutton.click();
+      await browser.pause(5000);
+    } else {
+      meetingsuccess = false;
+    }
+    
+    if (meetingsuccess) {
+      await SendEmail(
+        "<b>Demo Meeting Working Fine</b>",
+        "Demo Meeting Working Fine"
+      );
+    } else {
+      await SendEmail(
+        "<b>Demo Meeting Isn't working</b>",
+        "Demo Meeting Isn't working"
+      );
     }
   });
 });
