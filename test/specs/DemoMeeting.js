@@ -1,75 +1,110 @@
-describe("interaction with web element",function()
-{
-    it("enter the value in the field",async() => {
-     
-await browser.url("https://bozu.us")
-await browser.maximizeWindow();
-await browser.pause(5000);
-let JoinEvent=await $("//button[@class='btn btn-theme-select mt-2 mb-2']");
-await JoinEvent.waitForDisplayed({timeout:90000});
-//let JoinEvent=await $("//button[text()='Join Event Now']");
-await JoinEvent.click();
-await browser.pause(3000)
+import demoeventPage from "../pageobjects/demoevent.page.js";
+import homePage from "../pageobjects/home.page.js";
+import joineventPage from "../pageobjects/joinevent.page.js";
+import welcomeDemoEventPage from "../pageobjects/welcomeDemoEvent.page";
 
-let JoinDemoMeeting=await $("div[class='col-12 mt-4 text-center mb-3']");
-await JoinDemoMeeting.click();
-await browser.pause(3000)
+describe("Demo Meeting", function () {
 
-let Enteryourname=await $("input[placeholder='Enter your name ']");
-await Enteryourname.addValue("Nirali");
-await browser.pause(3000);
+  before("Open app", async () => {
 
-let JoinDemoMeetingNow=await $("div[class='col-lg-12 col-md-12 col-12 text-center mb-4']");
-await JoinDemoMeetingNow.click();
-await browser.pause(3000)
+    await browser.url("https://bozu.us");
+    await browser.maximizeWindow();
+  })
 
-let JoinEventNow=await $("//button[@class='btn btn-lg btn-green-select ml-3']");
-await JoinEventNow.click();
-await browser.pause(5000)
+  it("should validate join event now button", async () => {
+    await homePage.joinEventNow.waitForDisplayed({ timeout: 20000 })
+    await expect(homePage.joinEventNow).toBeEnabled();
+    await expect(homePage.joinEventNow).toHaveText("Join Event Now");
+  })
 
-let Okay=await $("//button[@class='btn btn-theme-select mb-lg-2']");
-await Okay.click();
-await browser.pause(5000)
+  it("should validate join event now page navigation", async () => {
+    await homePage.clickOnJoinEventNow();
+    await expect(browser).toHaveUrl("https://bozu.us/joinevent");
+  })
+  it("should validate joining event and demo", async () => {
 
-let Cancel=await $("//a[@class='text-first ml-auto d-flex align-item-baseline a-no-underline']");
-if(await Cancel.isDisplayed()){
-  await Cancel.click();
-}
-await browser.pause(5000)
+    await joineventPage.clickOnJoinDemoMeeting();
 
-//let BozuTechsupport=await $("//div[text()=' Bozu Tech support  ']");
-//let BozuStory=await $("//div[@class='text-overflow float-left text-white']");  
-//let BozuTechsupport=await $("//div[text()=' Bozu Tech support  ']");
-//await browser.pause(3000);
-//let BozuStory=await $("//div[contains(text(),' Bozu Story  ')]//parent::div//div[@class='position-relative dropleft d-flex ng-star-inserted']");
-let BozuStory=await $("//div[contains(text(),'BOZU STORY')]//parent::div//div[@class='position-relative dropleft d-flex ng-star-inserted']");
-BozuStory.waitForDisplayed({timeout:10000});
-//console.log('-----bozustory----------',BozuStory)
-await BozuStory.click();
-await browser.pause(2000);
+    await joineventPage.setUser("Nirali");
+    await expect(joineventPage.joinDemoMeetingNow).toBeEnabled();
 
-//let BozuStory=await $("//div[text()=' Bozu Story  ']");
-//let Dot=await $("//div[@class='position-relative dropleft d-flex ng-star-inserted show']");
-//console.log('-----dot----------',Dot)
-//await Dot.click();
-//await browser.pause(6000);
+    await joineventPage.clickOnJoinDemoMeetingNow();
+    await expect(welcomeDemoEventPage.welcomeDemoEventPageHeader).toHaveText("Welcome to Demo Event");
 
- let JoinGroup=await $("//label[@class='ml-2']");//label[text()='Join Group']
- JoinGroup.waitForDisplayed({timeout:10000});
- await JoinGroup.click();
- await browser.pause(5000);
+    await welcomeDemoEventPage.clickOnselectAudioButton();
+    await welcomeDemoEventPage.clickOnselectVideoButton();
 
- let audio=await $('#Icon_awesome-microphone-alt-slash');
- await audio.click();
- await browser.pause(10000);
+    await expect(demoeventPage.joinEventNow).toBeClickable();
+    await demoeventPage.clickOnJoinEventNowButton();
+    await expect(demoeventPage.okayPopup).toHaveText("Okay");
 
- let video=await $('#Icon_awesome-video-slash');
- await video.click();
- await browser.pause(10000);
+    await demoeventPage.clickOnOkButton();
+    await expect(demoeventPage.demoEventHeader).toHaveText("Demo Event");
 
+    await demoeventPage.clickOnCanelPopupIfDisplayed();
+    await demoeventPage.clickOnBozuStory();
 
+    await browser.waitUntil(async () => (await demoeventPage.bozuStoryPeers).length > 0);
+    let listofBozuStoryPeers = await demoeventPage.bozuStoryPeers.map(async peer => {
+      await browser.waitUntil(async () => await peer.getText() !== "")
+      return await peer.getText();
+    })
+    expect(listofBozuStoryPeers).toContain("Atul");
+    expect(listofBozuStoryPeers).toContain("Bhavika");
+
+    await browser.waitUntil(async () => (await demoeventPage.bozuTechStoryPeers).length > 0);
+    let listofBozuTechStoryPeers = await demoeventPage.bozuTechStoryPeers.map(async peer => {
+      await browser.waitUntil(async () => await peer.getText() !== "")
+      return await peer.getText()
+    })
+    expect(listofBozuTechStoryPeers).toContain("Jaydeep");
+    expect(listofBozuTechStoryPeers).toContain("Unnati");
+
+    await demoeventPage.aAudio.waitForDisplayed({ timeout: 10000 });
+    await expect(demoeventPage.aAudio).toBeDisplayed();
+
+    await demoeventPage.aVideo.waitForDisplayed({ timeout: 10000 });
+    await expect(demoeventPage.aVideo).toBeDisplayed();
+
+    await demoeventPage.bAudio.waitForDisplayed({ timeout: 10000 });
+    await expect(demoeventPage.bAudio).toBeDisplayed();
+
+    await demoeventPage.bVideo.waitForDisplayed({ timeout: 10000 });
+    await expect(demoeventPage.bVideo).toBeDisplayed();
+
+    await demoeventPage.jAudio.waitForDisplayed({ timeout: 10000 });
+    await expect(demoeventPage.jAudio).toBeDisplayed();
+
+    await demoeventPage.jVideo.waitForDisplayed({ timeout: 10000 });
+    await expect(demoeventPage.jVideo).toBeDisplayed();
+
+    await demoeventPage.uAudio.waitForDisplayed({ timeout: 10000 });
+    await expect(demoeventPage.uAudio).toBeDisplayed();
+
+    await demoeventPage.uVideo.waitForDisplayed({ timeout: 10000 });
+    await expect(demoeventPage.uVideo).toBeDisplayed();
+
+    await demoeventPage.joinGroup.waitForClickable({ timeout: 20000 });
+    await expect(demoeventPage.joinGroup).toBeClickable();
+    await demoeventPage.clickOnjoinGroup();
+
+    await expect(demoeventPage.insertedPeer).toHaveText("Nirali");
+
+    await expect(demoeventPage.audioButton).toBeExisting();
+    await demoeventPage.clickOnaudioButton();
+    await expect(demoeventPage.mute).toBeDisplayed();
+
+    await expect(demoeventPage.videoButton).toBeExisting();
+    await demoeventPage.clickOnvideoButton();
+    await expect(demoeventPage.turnvideooff).toBeDisplayed();
+
+    await expect(demoeventPage.sharescreenButton).toBeExisting();
+    await demoeventPage.clickOnsharescreenButton();
+    await expect(demoeventPage.sharescreenDeSelect).toBeDisplayed();
+
+    await demoeventPage.clickOncancelButton();
+
+    await browser.pause(2000);
   });
 
-
-  
 });
