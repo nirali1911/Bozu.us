@@ -24,7 +24,7 @@ exports.config = {
     // will be called from there.
     //
     //specs: ['./test/specs/DemoM*.js/search.js'],
-    specs: ['./test/specs/GameEvent.js'],
+    specs: ['./test/specs/DemoMeeting.js'],
     // Patterns to exclude.
     exclude: [
         // 'path/to/excluded/files'
@@ -177,7 +177,7 @@ exports.config = {
         ['allure', {
             outputDir: './report/allure-results',
             disableWebdriverStepsReporting: true,
-            disableWebdriverScreenshotsReporting: true,
+            disableWebdriverScreenshotsReporting: false,
         }]
     ],
     //
