@@ -15,8 +15,6 @@ describe("Demo Meeting", function () {
     await homePage.joinEventNow.waitForDisplayed({ timeout: 20000 })
     await expect(homePage.joinEventNow).toBeEnabled();
     await expect(homePage.joinEventNow).toHaveText("Join Event Now");
-    expect(await homePage.joinEventNow.getText()).not.toEqual("Event is not started yet. ");
-
   })
 
   it("should validate join event now page navigation", async () => {
@@ -24,7 +22,7 @@ describe("Demo Meeting", function () {
     await expect(browser).toHaveUrl("https://bozu.us/joinevent");
   })
   it("should validate joining event and demo", async () => {
-    await expect(joineventPage.joinDemoMeeting).toBeClickable();
+
     await joineventPage.clickOnJoinDemoMeeting();
 
     await joineventPage.setUser("Nirali");
@@ -33,8 +31,8 @@ describe("Demo Meeting", function () {
     await joineventPage.clickOnJoinDemoMeetingNow();
     await expect(welcomeDemoEventPage.welcomeDemoEventPageHeader).toHaveText("Welcome to Demo Event");
 
-    await welcomeDemoEventPage.clickOnselectAudioButton();
-    await welcomeDemoEventPage.clickOnselectVideoButton();
+    //await welcomeDemoEventPage.clickOnselectAudioButton();
+    //await welcomeDemoEventPage.clickOnselectVideoButton();
 
     await expect(demoeventPage.joinEventNow).toBeClickable();
     await demoeventPage.clickOnJoinEventNowButton();
@@ -62,13 +60,10 @@ describe("Demo Meeting", function () {
     expect(listofBozuTechStoryPeers).toContain("Jaydeep");
     expect(listofBozuTechStoryPeers).toContain("Unnati");
 
-    await expect(demoeventPage.atulVideoVisibility).toBeExisting();
-    await expect(demoeventPage.bhavikaVideoVisibility).toBeExisting();
-    await expect(demoeventPage.jaydeepVideoVisibility).toBeExisting();
-    await expect(demoeventPage.unnatiVideoVisibility).toBeExisting();
-
+    await demoeventPage.aAudio.waitForDisplayed({ timeout: 10000 });
     await expect(demoeventPage.aAudio).toBeDisplayed();
 
+    await demoeventPage.aVideo.waitForDisplayed({ timeout: 10000 });
     await expect(demoeventPage.aVideo).toBeDisplayed();
 
     await demoeventPage.bAudio.waitForDisplayed({ timeout: 10000 });
@@ -89,14 +84,15 @@ describe("Demo Meeting", function () {
     await demoeventPage.uVideo.waitForDisplayed({ timeout: 10000 });
     await expect(demoeventPage.uVideo).toBeDisplayed();
 
+    await demoeventPage.joinGroup.waitForClickable({ timeout: 20000 });
     await expect(demoeventPage.joinGroup).toBeClickable();
     await demoeventPage.clickOnjoinGroup();
 
     await expect(demoeventPage.insertedPeer).toHaveText("Nirali");
 
-    //await expect(demoeventPage.audioButton).toBeExisting();
-    //await demoeventPage.clickOnaudioButton();
-    //await expect(demoeventPage.mute).toBeDisplayed();
+    await expect(demoeventPage.audioButton).toBeExisting();
+    await demoeventPage.clickOnaudioButton();
+    await expect(demoeventPage.mute).toBeDisplayed();
 
     await expect(demoeventPage.videoButton).toBeExisting();
     await demoeventPage.clickOnvideoButton();

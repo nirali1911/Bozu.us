@@ -1,3 +1,6 @@
+const fs = require('fs-extra');
+import { SendEmail } from './test/specs/Nodemailerdemo';
+let resultList = [];
 exports.config = {
     //
     // ====================
@@ -21,7 +24,7 @@ exports.config = {
     // will be called from there.
     //
     //specs: ['./test/specs/DemoM*.js/search.js'],
-    specs: ['./test/specs/DemoMeeting.js'],
+    specs: ['./test/specs/GameEvent.js'],
     // Patterns to exclude.
     exclude: [
         // 'path/to/excluded/files'
@@ -63,19 +66,16 @@ exports.config = {
                 //'--disable-popup-blocking',
                 //'--disable-notifications',
                 // '--headless',
-               // '--disable-gpu',
-               '--use-fake-device-for-media-stream',
-               '--use-fake-ui-for-media-stream'
-               
-
-                
-                
-                
+                // '--disable-gpu',
+                //'--use-fake-device-for-media-stream',
+                '--use-fake-ui-for-media-stream',
+                'auto-select-desktop-capture-source',
+                '--enable-usermedia-screen-capturing'
             ],
-            
-            prefs:{
-                'profiled.managed_default_content_settings.popups':1,
-                'profiled.managed_default_content_settings.notifications':1
+
+            prefs: {
+                'profiled.managed_default_content_settings.popups': 1,
+                'profiled.managed_default_content_settings.notifications': 1
             }
         },
         acceptInsecureCerts: true
@@ -91,7 +91,7 @@ exports.config = {
     // Define all options that are relevant for the WebdriverIO instance here
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
-    logLevel: 'info',
+    logLevel: 'error',
     //
     // Set specific log levels per logger
     // loggers:
@@ -157,7 +157,7 @@ exports.config = {
     framework: 'mocha',
     //
     // The number of times to retry the entire specfile when it fails as a whole
-    // specFileRetries: 1,
+    specFileRetries: 0,
     //
     // Delay in seconds between the spec file retry attempts
     // specFileRetriesDelay: 0,
@@ -173,6 +173,11 @@ exports.config = {
         'spec',
         ['junit', {
             outputDir: './report'
+        }],
+        ['allure', {
+            outputDir: './report/allure-results',
+            disableWebdriverStepsReporting: true,
+            disableWebdriverScreenshotsReporting: true,
         }]
     ],
     //
@@ -271,16 +276,36 @@ exports.config = {
      * @param {Boolean} result.passed    true if test has passed, otherwise false
      * @param {Object}  result.retries   informations to spec related retries, e.g. `{ attempts: 0, limit: 0 }`
      */
-    // afterTest: function(test, context, { error, result, duration, passed, retries }) {
-    // },
+    afterTest: async function (test, context, { error, result, duration, passed, retries }) {
+        if (passed) {
+            resultList.push("PASS")
+        }
+        else if (!passed) {
+            await browser.takeScreenshot();
+            resultList.push("FAIL")
+        }
+    },
 
 
     /**
      * Hook that gets executed after the suite has ended
      * @param {Object} suite suite details
      */
-    // afterSuite: function (suite) {
-    // },
+    afterSuite: async function (suite) {
+        let result  = resultList.every(result => result === "PASS")
+
+        if (result) {
+            await SendEmail(
+              `<b>${suite.title} Working Fine</b>`,
+              `${suite.title} Working Fine`
+            );
+          } else {
+            await SendEmail(
+              `<b>${suite.title} Isn't working</b>`,
+              `${suite.title} Isn't working`
+            );
+          }
+    },
     /**
      * Runs after a WebdriverIO command gets executed
      * @param {String} commandName hook command name
